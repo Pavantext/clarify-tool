@@ -1,5 +1,5 @@
 import streamlit as st
-from main import clarify_text, challenge_text
+from main import clarify_text, challenge_text, devils_advocate
 import time
 
 # Set page configuration
@@ -109,8 +109,9 @@ with st.sidebar:
     This AI educational assistant helps:
     - Simplify complex topics
     - Generate advanced insights
-    - Provide examples and definitions
-    - Create critical thinking questions
+    - Challenge assumptions and biases
+    - Explore alternative perspectives
+    - Encourage evidence-based thinking
     """)
 
 # Initialize session state
@@ -124,7 +125,7 @@ st.markdown("<h1 class='main-header'>Educational AI Assistant</h1>", unsafe_allo
 
 # Input section with audience level
 user_input = st.text_area("Enter your text here...", height=100)
-col1, col2 = st.columns(2)
+col1, col2, col3 = st.columns(3)
 
 def process_and_store(text, mode):
     # Store user input
@@ -133,8 +134,10 @@ def process_and_store(text, mode):
     with st.spinner(f'Generating {mode} response...'):
         if mode == "clarify":
             response = clarify_text(text, audience_level.lower())
-        else:
+        elif mode == "challenge":
             response = challenge_text(text, audience_level.lower())
+        else:
+            response = devils_advocate(text)
     
     # Store assistant response
     st.session_state.chat_history.append({"role": "assistant", "content": response})
@@ -150,6 +153,15 @@ if col1.button("🔍 Clarify", use_container_width=True):
 if col2.button("🎯 Challenge", use_container_width=True):
     if user_input:
         process_and_store(user_input, "challenge")
+    else:
+        st.warning("Please enter some text first!")
+
+if col3.button("⚖️ Devil's Advocate", use_container_width=True):
+    if user_input:
+        with st.spinner('Analyzing perspectives...'):
+            response = devils_advocate(user_input)
+            st.session_state.chat_history.append({"role": "user", "content": user_input})
+            st.session_state.chat_history.append({"role": "assistant", "content": response})
     else:
         st.warning("Please enter some text first!")
 

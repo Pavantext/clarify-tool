@@ -71,9 +71,50 @@ def challenge_text(input_text: str, audience_level: str = "advanced") -> str:
     )
     return response.choices[0].message.content
 
+def devils_advocate(input_text: str) -> str:
+    """
+    Analyzes text and provides critical perspectives, challenges assumptions,
+    and encourages evidence-based thinking.
+    """
+    response = client.chat.completions.create(
+        model="deepseek-ai/DeepSeek-V3",
+        messages=[
+            {"role": "system", "content": """You are a Devil's Advocate assistant that helps educators explore alternative perspectives and challenge their views constructively.
+
+            Structure your response as follows:
+            1. Main Points & Assumptions Identified
+               - Key arguments
+               - Supporting points
+               - Implicit assumptions
+
+            2. Alternative Perspectives & Challenges
+               - Different viewpoints
+               - Potential counterarguments
+               - Areas needing more exploration
+
+            3. Evidence-Based Analysis
+               - Suggestions for supporting evidence
+               - Areas requiring additional data
+               - Research questions to consider
+
+            4. Bias Assessment
+               - Potential cognitive biases
+               - Perspective limitations
+               - Bias reduction suggestions
+
+            5. Adaptability Suggestions
+               - Ways to refine arguments
+               - Alternative approaches
+               - Implementation considerations"""},
+            {"role": "user", "content": input_text}
+        ],
+        temperature=0.8,
+    )
+    return response.choices[0].message.content
+
 if __name__ == "__main__":
     # Choose mode
-    mode = input("Choose mode: For 'clarify' press 1 or For 'challenge' press 2: ").strip()
+    mode = input("Choose mode (1: clarify, 2: challenge, 3: devil's advocate): ").strip()
     
     input_text = input("Enter your text: ")
     
@@ -85,5 +126,9 @@ if __name__ == "__main__":
         challenged_output = challenge_text(input_text)
         print("\nChallenged Output:")
         print(challenged_output)
+    elif mode == "3":
+        devils_advocate_output = devils_advocate(input_text)
+        print("\nDevil's Advocate Analysis:")
+        print(devils_advocate_output)
     else:
-        print("Invalid mode selected. Please enter 1 for 'clarify' or 2 for 'challenge'.")
+        print("Invalid mode selected. Please enter 1 for 'clarify', 2 for 'challenge', or 3 for 'devil's advocate'.")
